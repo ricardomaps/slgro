@@ -39,8 +39,6 @@ struct client {
 	struct wl_list link;
 	struct swc_window* win;
 	struct screen* scr;
-	bool           mapped;
-	bool           floating;
 	bool           fullscreen;
 	int32_t        x;
 	int32_t        y;
@@ -54,22 +52,11 @@ struct config {
 	uint32_t       border_col_active;
 	uint32_t       border_col_normal;
 	uint32_t       border_width;
-	uint32_t       gaps;
-};
-
-struct grab {
-	bool           active;
-	bool           resize;
-	struct client* c;
 };
 
 struct screen {
 	struct wl_list link;
 	struct swc_screen* scr;
-	int32_t        x;
-	int32_t        y;
-	uint32_t       w;
-	uint32_t       h;
 };
 
 struct wm {
@@ -81,7 +68,6 @@ struct wm {
 
 	struct screen* sel_screen;
 	struct client* sel_client;
-	struct grab    grab;
 	uint8_t        ws;
 };
 
