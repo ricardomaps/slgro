@@ -6,7 +6,6 @@
 #include "types.h"
 
 extern void focus_next(void* data, uint32_t time, uint32_t value, uint32_t state);
-extern void focus_prev(void* data, uint32_t time, uint32_t value, uint32_t state);
 extern void kill_sel(void* data, uint32_t time, uint32_t value, uint32_t state);
 extern void fullscreen(void* data, uint32_t time, uint32_t value, uint32_t state);
 extern void kb_move_x(void* data, uint32_t time, uint32_t value, uint32_t state);
@@ -25,4 +24,4 @@ extern void workspace_goto(void* data, uint32_t time, uint32_t value, uint32_t s
 extern void workspace_moveto(void* data, uint32_t time, uint32_t value, uint32_t state);
 extern struct wm wm;
 
-#endif /* TOHU_H */
+#endif /* SLGRO_H */
