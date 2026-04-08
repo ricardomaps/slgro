@@ -9,7 +9,12 @@
 #include <wayland-util.h>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
-#include "config.h"
+/* this is for lua-config.c !!! awwa!!awaw!!waw!! */
+extern struct config cfg;
+extern struct bind *binds;
+extern size_t nbinds;
+extern void load_config(void);
+
 #include "include/types.h"
 #include "include/util.h"
 #include "include/slgro.h"
@@ -154,6 +159,7 @@ static void on_win_entered(void* data)
 static void setup(void)
 {
 	/* display */
+	load_config();
 	wm.dpy = wl_display_create();
 	if (!wm.dpy)
 		die(EXIT_FAILURE, "wl_display_create failed");
@@ -190,10 +196,10 @@ static void setup(void)
 
 static void setup_binds(void)
 {
-	for (size_t i = 0; i < LENGTH(binds); i++) {
-		const struct bind* b = &binds[i];
-		swc_add_binding(b->type, b->mods, b->ksym, b->fn, (void*)&b->arg);
-	}
+    for (size_t i = 0; i < nbinds; i++) {
+        const struct bind* b = &binds[i];
+        swc_add_binding(b->type, b->mods, b->ksym, b->fn, (void*)&b->arg);
+    }
 }
 
 static void sync_window_visibility(void)
