@@ -1,0 +1,31 @@
+Hai!! Im dani, and im here to teach you how to build slgro *super epic music starts playing* ouowowuwowuwwowowuw
+-------------------------------------------------------------------------------------------------------
+
+dependencies
+================ 
+
+at build time :
+meson, ninja, wayland-dev, libxkbcommon-dev, libinput-dev, libdrm-dev, fontconfig-dev, pixman-dev, xcb-util-wm-dev, xwayland-dev, luajit-dev
+
+at runtime :
+neuwld (https://git.sr.ht/~shrub900/neuwld) neuswc (https://git.sr.ht/~shrub900/neuswc), luajit
+
+
+building
+========
+meson setup build
+ninja -C build
+sudo ninja -C build install
+sudo chmod 4755 /usr/bin/swc-launch
+
+
+config
+======
+copy the config.lua to ~/.config/slgro/config.lua and edit it to your liking :D
+slgro reads it on startup, so, no need to recompile for config changes!!
+
+mkdir -p ~/.config/slgro
+cp config.lua ~/.config/slgro/config.lua
+
+-------------------------------------------------------------------------------------------------------
+That's it, with this you can now use slgro!! wowie!! for any questions, contact me at @ouppy:4d2.org xP
