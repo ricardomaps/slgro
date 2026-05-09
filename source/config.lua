@@ -1,16 +1,20 @@
-motion_throttle_hz     = 85
-
 border_active          = 0xffffffff
 border_normal          = 0xffffffff
 border_width           = 2
 
-decor_title_enabled = true
-decor_title_edge    = "left"
-decor_title_align   = "start"
-decor_title_color   = 0xffe8faea
-decor_title_padding = 8
-decor_color    = 0xffffffff
-decor_title_font    = "monospace:size=12" -- idk what to set as a default font here so uhhh imma slap monospace here idk lol
+decor_color            = 0xff2a2a2a
+decor_top              = 24
+decor_left             = 2
+decor_right            = 2
+decor_bottom           = 2
+decor_title_enabled    = true -- turn this off if you dont want decors!!
+decor_title_edge       = "top"
+decor_title_align      = "center"
+decor_title_color      = 0xff8aaa8a
+decor_title_padding    = 8
+decor_title_font       = "monospace:size=12" -- idk what to set as a default font here so uhhh imma slap monospace here idk lol
+
+motion_throttle_hz     = 85
 
 terminal    = "foot"
 menu        = "neumenu_run"
