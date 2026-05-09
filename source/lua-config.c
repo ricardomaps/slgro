@@ -14,16 +14,14 @@ struct config cfg;
 struct bind *binds = NULL;
 size_t nbinds = 0;
 
-static char *spawn_args[128][2]; /* I'd ASSUME that 128 binds SHOULD be enough.........,..,., */
+static char *spawn_args[128][2];
 static size_t nspawn = 0;
 
 static uint32_t parse_mods(const char *s) {
-
     uint32_t mods = 0;
     char buf[64];
     strncpy(buf, s, sizeof(buf) - 1);
     char *tok = strtok(buf, "|");
-
     while (tok) {
         if      (!strcmp(tok, "MOD4")) mods |= SWC_MOD_LOGO;
         else if (!strcmp(tok, "MOD1")) mods |= SWC_MOD_ALT;
@@ -31,18 +29,15 @@ static uint32_t parse_mods(const char *s) {
         else if (!strcmp(tok, "CTRL")) mods |= SWC_MOD_CTRL;
         tok = strtok(NULL, "|");
     }
-
     return mods;
 }
 
 static uint32_t parse_key(const char *s) {
-
     if (s[1] == '\0') {
         if (s[0] >= 'a' && s[0] <= 'z') return XKB_KEY_a + (s[0] - 'a');
         if (s[0] >= '1' && s[0] <= '9') return XKB_KEY_1 + (s[0] - '1');
         if (s[0] == '0') return XKB_KEY_0;
     }
-
     if (!strcmp(s, "Return")) return XKB_KEY_Return;
     if (!strcmp(s, "Tab"))    return XKB_KEY_Tab;
     if (!strcmp(s, "space"))  return XKB_KEY_space;
@@ -51,21 +46,17 @@ static uint32_t parse_key(const char *s) {
     if (!strcmp(s, "Up"))     return XKB_KEY_Up;
     if (!strcmp(s, "Down"))   return XKB_KEY_Down;
     fprintf(stderr, "slgro: sorry, unknown key >.< '%s'\n", s);
-
     return XKB_KEY_VoidSymbol;
 }
 
 static void resolve_action(const char *action, const char *arg_str, int arg_int, struct bind *b) {
-
     b->type = SWC_BINDING_KEY;
-
     if (!strcmp(action, "spawn")) {
         spawn_args[nspawn][0] = strdup(arg_str);
         spawn_args[nspawn][1] = NULL;
         b->arg.v = spawn_args[nspawn++];
         b->fn = spawn;
     }
-    
     else if (!strcmp(action, "kill"))             b->fn = kill_sel;
     else if (!strcmp(action, "focus_next"))       b->fn = focus_next;
     else if (!strcmp(action, "fullscreen"))       b->fn = fullscreen;
@@ -83,42 +74,109 @@ static void resolve_action(const char *action, const char *arg_str, int arg_int,
 }
 
 void load_config(void) {
-
     const char *home = getenv("HOME");
     char path[256];
     snprintf(path, sizeof(path), "%s/.config/slgro/config.lua", home ? home : ".");
 
-    cfg.motion_throttle_hz = 85;
-    cfg.border_col_active  = 0xffffffff;
-    cfg.border_col_normal  = 0xffffffff;
-    cfg.border_width       = 2;
+    cfg.motion_throttle_hz   = 85;
+    cfg.border_col_active    = 0xffffffff;
+    cfg.border_col_normal    = 0xffffffff;
+    cfg.border_width         = 2;
+    
+    /* defaults for le slgro v1.3 titlebar update, leaving this here currently for testing */
+    cfg.decor.color          = 0xff444444;
+    cfg.decor.top            = 2;
+    cfg.decor.right          = 2;
+    cfg.decor.bottom         = 2;
+    cfg.decor.left           = 24;
+    cfg.decor.title.enabled  = false;
+    cfg.decor.title.edge     = SWC_DECOR_EDGE_LEFT;
+    cfg.decor.title.align    = SWC_DECOR_ALIGN_START;
+    cfg.decor.title.color    = 0xffffffff;
+    cfg.decor.title.padding  = 8;
+    cfg.decor.title.font     = "monospace:size=12";
 
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
 
     if (luaL_dofile(L, path) != LUA_OK) {
-            if (luaL_dofile(L, "/usr/share/slgro/config.lua") != LUA_OK) {
-                fprintf(stderr, "slgro: %s\n", lua_tostring(L, -1));
-                fprintf(stderr, "slgro: using defaults :P\n");
-                lua_close(L);
-                return;
-            }
+        if (luaL_dofile(L, "/usr/share/slgro/config.lua") != LUA_OK) {
+            fprintf(stderr, "slgro: %s\n", lua_tostring(L, -1));
+            fprintf(stderr, "slgro: using defaults :P\n");
+            lua_close(L);
+            return;
+        }
     }
 
     lua_getglobal(L, "border_active");
-    if (lua_isnumber(L, -1)) cfg.border_col_active = lua_tonumber(L, -1);
+    if (lua_isnumber(L, -1)) cfg.border_col_active = (uint32_t)lua_tonumber(L, -1);
     lua_pop(L, 1);
 
     lua_getglobal(L, "border_normal");
-    if (lua_isnumber(L, -1)) cfg.border_col_normal = lua_tonumber(L, -1);
+    if (lua_isnumber(L, -1)) cfg.border_col_normal = (uint32_t)lua_tonumber(L, -1);
     lua_pop(L, 1);
 
     lua_getglobal(L, "border_width");
-    if (lua_isnumber(L, -1)) cfg.border_width = lua_tonumber(L, -1);
+    if (lua_isnumber(L, -1)) cfg.border_width = (uint32_t)lua_tonumber(L, -1);
     lua_pop(L, 1);
 
     lua_getglobal(L, "motion_throttle_hz");
-    if (lua_isnumber(L, -1)) cfg.motion_throttle_hz = lua_tonumber(L, -1);
+    if (lua_isnumber(L, -1)) cfg.motion_throttle_hz = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_color");
+    if (lua_isnumber(L, -1)) cfg.decor.color = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_top");
+    if (lua_isnumber(L, -1)) cfg.decor.top = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_right");
+    if (lua_isnumber(L, -1)) cfg.decor.right = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_bottom");
+    if (lua_isnumber(L, -1)) cfg.decor.bottom = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_left");
+    if (lua_isnumber(L, -1)) cfg.decor.left = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_title_enabled");
+    cfg.decor.title.enabled = lua_toboolean(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_title_color");
+    if (lua_isnumber(L, -1)) cfg.decor.title.color = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_title_padding");
+    if (lua_isnumber(L, -1)) cfg.decor.title.padding = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_title_font");
+    if (lua_isstring(L, -1)) cfg.decor.title.font = strdup(lua_tostring(L, -1));
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_title_edge");
+    if (lua_isstring(L, -1)) {
+        const char *e = lua_tostring(L, -1);
+        if      (!strcmp(e, "top"))    cfg.decor.title.edge = SWC_DECOR_EDGE_TOP;
+        else if (!strcmp(e, "right"))  cfg.decor.title.edge = SWC_DECOR_EDGE_RIGHT;
+        else if (!strcmp(e, "bottom")) cfg.decor.title.edge = SWC_DECOR_EDGE_BOTTOM;
+        else                           cfg.decor.title.edge = SWC_DECOR_EDGE_LEFT;
+    }
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "decor_title_align");
+    if (lua_isstring(L, -1)) {
+        const char *a = lua_tostring(L, -1);
+        if      (!strcmp(a, "center")) cfg.decor.title.align = SWC_DECOR_ALIGN_CENTER;
+        else if (!strcmp(a, "end"))    cfg.decor.title.align = SWC_DECOR_ALIGN_END;
+        else                           cfg.decor.title.align = SWC_DECOR_ALIGN_START;
+    }
     lua_pop(L, 1);
 
     lua_getglobal(L, "binds");
@@ -128,11 +186,12 @@ void load_config(void) {
         return;
     }
 
-    size_t n = lua_objlen(L, -1);
+    int binds_index = lua_gettop(L);
+    size_t n = lua_objlen(L, binds_index);
     binds = calloc(n, sizeof(struct bind));
 
     for (size_t i = 1; i <= n; i++) {
-        lua_rawgeti(L, -1, i);
+        lua_rawgeti(L, binds_index, i);
         struct bind b = {0};
 
         lua_getfield(L, -1, "mods");
@@ -148,8 +207,8 @@ void load_config(void) {
         lua_pop(L, 1);
 
         lua_getfield(L, -1, "arg");
-        const char *arg_str = lua_isstring(L, -1)  ? lua_tostring(L, -1)  : "";
-        int         arg_int = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
+        const char *arg_str = lua_isstring(L, -1) ? lua_tostring(L, -1) : "";
+        int         arg_int = lua_isnumber(L, -1) ? (int)lua_tonumber(L, -1) : 0;
         lua_pop(L, 1);
 
         if (action) resolve_action(action, arg_str, arg_int, &b);
