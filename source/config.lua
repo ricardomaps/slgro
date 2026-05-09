@@ -1,14 +1,27 @@
+motion_throttle_hz     = 85
+
 border_active          = 0xffffffff
 border_normal          = 0xffffffff
 border_width           = 2
-motion_throttle_hz     = 85
+
+decor_title_enabled = true
+decor_title_edge    = "left"
+decor_title_align   = "start"
+decor_title_color   = 0xffe8faea
+decor_title_padding = 8
+decor_color    = 0xffffffff
+decor_title_font    = "monospace:size=12" /* idk what to set as a default font here so uhhh imma slap monospace here idk lol */
 
 terminal    = "foot"
-menu        = "neumenu-run"
+menu        = "neumenu_run"
 
 binds = {
     { mods="MOD4",       key="q",      action="spawn",          arg=terminal },
     { mods="MOD4",       key="d",      action="spawn",          arg=menu },
+    { mods="MOD4",       key="w",      action="spawn",          arg=browser },
+    { mods="MOD4",       key="e",      action="spawn",          arg=files },
+    { mods="MOD4",       key="b",      action="spawn",          arg=bluetooth },
+    { mods="MOD4|SHFT",  key="s",      action="spawn",          arg=screenshot },
     { mods="MOD4",       key="Tab",    action="focus_next" },
     { mods="MOD4",       key="f",      action="fullscreen" },
     { mods="MOD4",       key="c",      action="kill" },
@@ -23,6 +36,7 @@ binds = {
     { mods="MOD4|SHFT",  key="Up",     action="resize_height",  arg=-25 },
     { mods="MOD4",       key="h",      action="snap_left" },
     { mods="MOD4",       key="l",      action="snap_right" },
+    { mods="MOD4|SHFT",  key="Return", action="quit" },
     { mods="MOD4",       key="1",      action="workspace_goto",   arg=1 },
     { mods="MOD4",       key="2",      action="workspace_goto",   arg=2 },
     { mods="MOD4",       key="3",      action="workspace_goto",   arg=3 },
