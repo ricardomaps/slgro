@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -28,6 +29,8 @@ static void on_win_entered(void* data);
 static void setup(void);
 static void setup_binds(void);
 static void sync_window_visibility(void);
+static void apply_decor(struct client* c, bool active);
+static const char* decorstring(struct client* c, char* buf, size_t size);
 
 #define WHEN_PRESSED(state) \
 	do { if ((state) != WL_KEYBOARD_KEY_STATE_PRESSED) return; } while (0)
@@ -67,6 +70,57 @@ static void adjust_geom(struct client *c, int dx, int dy, int dw, int dh)
 	swc_window_set_geometry(c->win, &geom);
 }
 
+static const char* decorstring(struct client* c, char* buf, size_t size)
+{
+    char path[64];
+    FILE* fp;
+    pid_t pid;
+    size_t len;
+
+    if (!c || !buf || size == 0)
+        return NULL;
+
+    pid = swc_window_get_pid(c->win);
+    if (pid <= 0)
+        return NULL;
+
+    snprintf(path, sizeof(path), "/proc/%lld/comm", (long long)pid);
+    fp = fopen(path, "r");
+    if (!fp)
+        return NULL;
+
+    if (!fgets(buf, (int)size, fp)) {
+        fclose(fp);
+        return NULL;
+    }
+
+    fclose(fp);
+    len = strcspn(buf, "\n");
+    buf[len] = '\0';
+    return buf[0] ? buf : NULL;
+}
+
+static void apply_decor(struct client* c, bool active)
+{
+    char process_name[256];
+    const char* title;
+    struct swc_decor decor;
+
+    if (!c)
+        return;
+
+    if (c->fullscreen) {
+        swc_window_set_decor(c->win, NULL);
+        return;
+    }
+
+    decor = cfg.decor;
+    title = decorstring(c, process_name, sizeof(process_name));
+    if (title)
+        decor.title.string = title;
+    swc_window_set_decor(c->win, &decor);
+}
+
 struct wm wm;
 const struct swc_manager manager = {
 	.new_screen = new_screen, .new_window = new_window, .new_device = new_device,
@@ -86,15 +140,17 @@ static struct client* get_focus_candidate(struct screen* s) {
 
 static void focus(struct client* c)
 {
-	if (wm.sel_client && wm.sel_client != c) {
-		swc_window_set_border(wm.sel_client->win, cfg.border_col_normal, cfg.border_width, 0, 0);
-	}
-	if (c) {
-		swc_window_set_border(c->win, cfg.border_col_active, cfg.border_width, 0, 0);
-	}
+    if (wm.sel_client && wm.sel_client != c) {
+        swc_window_set_border(wm.sel_client->win, cfg.border_col_normal, cfg.border_width, 0, 0);
+        apply_decor(wm.sel_client, false);
+    }
+    if (c) {
+        swc_window_set_border(c->win, cfg.border_col_active, cfg.border_width, 0, 0);
+        apply_decor(c, true);
+    }
 
-	swc_window_focus(c ? c->win : NULL);
-	wm.sel_client = c;
+    swc_window_focus(c ? c->win : NULL);
+    wm.sel_client = c;
 }
 
 static struct client* first_client(struct screen* s)
@@ -274,6 +330,7 @@ void fullscreen(void* data, uint32_t time, uint32_t value, uint32_t state)
 	if (c->fullscreen) {
 		c->fullscreen = false;
 		swc_window_set_stacked(c->win);
+        apply_decor(c, true);        
 
 		if (c->w > 0 && c->h > 0) {
 			geom = (struct swc_rectangle){ c->x, c->y, c->w, c->h };
@@ -292,6 +349,7 @@ void fullscreen(void* data, uint32_t time, uint32_t value, uint32_t state)
 	}
 
 	c->fullscreen = true;
+    apply_decor(c, true);
 	swc_window_set_fullscreen(c->win, c->scr->scr);
 }
 
@@ -383,6 +441,7 @@ void new_window(struct swc_window* win)
 	wl_list_insert(&wm.clients, &c->link);
 	swc_window_set_handler(win, &window_handler, c);
 	swc_window_set_stacked(win);
+    apply_decor(c, false);
 
 	int32_t cx = 0, cy = 0;
 	if (swc_cursor_position(&cx, &cy))
