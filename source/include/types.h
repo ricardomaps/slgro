@@ -73,4 +73,4 @@ struct wm {
 	uint8_t        ws;
 };
 
-#endif /* TYPES_H */%       
+#endif /* TYPES_H */
