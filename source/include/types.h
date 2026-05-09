@@ -48,6 +48,8 @@ struct client {
 };
 
 struct config {
+    bool           decor_enabled;
+    struct         swc_decor decor;
 	uint32_t       motion_throttle_hz;
 	uint32_t       border_col_active;
 	uint32_t       border_col_normal;
@@ -71,4 +73,4 @@ struct wm {
 	uint8_t        ws;
 };
 
-#endif /* TYPES_H */
+#endif /* TYPES_H */%       
