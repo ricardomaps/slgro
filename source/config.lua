@@ -10,7 +10,7 @@ decor_title_align   = "start"
 decor_title_color   = 0xffe8faea
 decor_title_padding = 8
 decor_color    = 0xffffffff
-decor_title_font    = "monospace:size=12" /* idk what to set as a default font here so uhhh imma slap monospace here idk lol */
+decor_title_font    = "monospace:size=12" -- idk what to set as a default font here so uhhh imma slap monospace here idk lol
 
 terminal    = "foot"
 menu        = "neumenu_run"
