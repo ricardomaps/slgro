@@ -14,10 +14,10 @@ deps = [
   dependency('libdrm'),
   dependency('wld'),
   dependency('libudev'),
-  dependency('xcb'),
-  dependency('xcb-composite'),
-  dependency('xcb-ewmh'),
-  dependency('xcb-icccm'),
+  dependency('xcb', required : false),
+  dependency('xcb-composite', required : false),
+  dependency('xcb-ewmh', required : false),
+  dependency('xcb-icccm', required : false),
   dependency('luajit'),
 ]
 
