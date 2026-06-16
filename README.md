@@ -14,4 +14,4 @@ As of writting this, the project is still very experimental, i will try to fix s
 
 slgro can be found on:
 - Codeberg (the "main" repository) : https://codeberg.org/0uppy/slgro
-- My personal Forgejo (where updates are pushed to Codeberg) : https://git.ouppyawa.xyz/0uppy/slgro
+- My personal Forgejo : https://git.ouppyawa.xyz/0uppy/slgro
