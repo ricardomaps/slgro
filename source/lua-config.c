@@ -17,7 +17,8 @@ size_t nbinds = 0;
 static char *spawn_args[128][2];
 static size_t nspawn = 0;
 
-static uint32_t parse_mods(const char *s) {
+static uint32_t parse_mods(const char *s)
+{
     uint32_t mods = 0;
     char buf[64];
     strncpy(buf, s, sizeof(buf) - 1);
@@ -32,7 +33,8 @@ static uint32_t parse_mods(const char *s) {
     return mods;
 }
 
-static uint32_t parse_key(const char *s) {
+static uint32_t parse_key(const char *s)
+{
     if (s[1] == '\0') {
         if (s[0] >= 'a' && s[0] <= 'z') return XKB_KEY_a + (s[0] - 'a');
         if (s[0] >= '1' && s[0] <= '9') return XKB_KEY_1 + (s[0] - '1');
@@ -49,7 +51,8 @@ static uint32_t parse_key(const char *s) {
     return XKB_KEY_VoidSymbol;
 }
 
-static void resolve_action(const char *action, const char *arg_str, int arg_int, struct bind *b) {
+static void resolve_action(const char *action, const char *arg_str, int arg_int, struct bind *b)
+{
     b->type = SWC_BINDING_KEY;
     if (!strcmp(action, "spawn")) {
         spawn_args[nspawn][0] = strdup(arg_str);
@@ -73,7 +76,8 @@ static void resolve_action(const char *action, const char *arg_str, int arg_int,
     else fprintf(stderr, "slgro: sorry, unknown action >.< '%s'\n", action);
 }
 
-void load_config(void) {
+void load_config(void)
+{
     const char *home = getenv("HOME");
     char path[256];
     snprintf(path, sizeof(path), "%s/.config/slgro/config.lua", home ? home : ".");
@@ -82,7 +86,7 @@ void load_config(void) {
     cfg.border_col_active    = 0xffffffff;
     cfg.border_col_normal    = 0xffffffff;
     cfg.border_width         = 2;
-    
+
     /* defaults for le slgro v1.3 titlebar update, leaving this here currently for testing */
     cfg.decor.color          = 0xff444444;
     cfg.decor.top            = 2;
