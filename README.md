@@ -13,4 +13,4 @@ This wm is a fork of tohu (https://git.sr.ht/~shrub900/tohu) which in itself is 
 slgro can be found on:
 - Codeberg (the "main" repository) : https://codeberg.org/0uppy/slgro
 - Srcdump : https://srcdump.net/0uppy/slgro/
-- My personal Forgejo : https://git.ouppyawa.xyz/0uppy/slgro
+- My cgit instance: https://git.ouppyawa.xyz/
