@@ -11,6 +11,6 @@ slgro is a floating (with keyboard-driven window movement, resizing and added ce
 This wm is a fork of tohu (https://git.sr.ht/~shrub900/tohu) which in itself is also a fork of wsxwm (https://git.sr.ht/~uint/wsxwm) go check both projects out!! Without the both of them slgro wouldn't exist!! ^^
 
 slgro can be found on:
-- Codeberg (the "main" repository) : https://codeberg.org/0uppy/slgro
 - Srcdump : https://srcdump.net/0uppy/slgro/
-- My cgit instance: https://git.ouppyawa.xyz/
+- My cgit instance (the main repository) : https://git.ouppyawa.xyz/
+- My github (for pull requests and what not) : https://github.com/soggymoder/slgro
