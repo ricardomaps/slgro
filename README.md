@@ -1,3 +1,5 @@
+## slgro will no longer be updated on codeberg. if you wish to see / get any future updates please check the links at the bottom of the README.md, sorry.
+
 # slgro
 
 ![slgro logo](source/slgro.png)
