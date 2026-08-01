@@ -1,5 +1,5 @@
 project('slgro', 'c',
-  version: '1.3',
+  version: '1.4',
   default_options: ['c_std=c99', 'warning_level=2'],
 )
 

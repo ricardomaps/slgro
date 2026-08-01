@@ -8,7 +8,6 @@
 
 #include "include/types.h"
 #include "include/slgro.h"
-#include "include/util.h"
 
 struct config cfg;
 struct bind *binds = NULL;
@@ -83,22 +82,14 @@ void load_config(void)
     snprintf(path, sizeof(path), "%s/.config/slgro/config.lua", home ? home : ".");
 
     cfg.motion_throttle_hz   = 85;
+
     cfg.border_col_active    = 0xffffffff;
     cfg.border_col_normal    = 0xffffffff;
     cfg.border_width         = 2;
 
-    /* defaults for le slgro v1.3 titlebar update, leaving this here currently for testing */
-    cfg.decor.color          = 0xff444444;
-    cfg.decor.top            = 2;
-    cfg.decor.right          = 2;
-    cfg.decor.bottom         = 2;
-    cfg.decor.left           = 24;
-    cfg.decor.title.enabled  = false;
-    cfg.decor.title.edge     = SWC_DECOR_EDGE_LEFT;
-    cfg.decor.title.align    = SWC_DECOR_ALIGN_START;
-    cfg.decor.title.color    = 0xffffffff;
-    cfg.decor.title.padding  = 8;
-    cfg.decor.title.font     = "monospace:size=12";
+    cfg.border_col_active_outer = 0;
+    cfg.border_col_normal_outer = 0;
+    cfg.border_width_outer      = 0;
 
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
@@ -124,63 +115,20 @@ void load_config(void)
     if (lua_isnumber(L, -1)) cfg.border_width = (uint32_t)lua_tonumber(L, -1);
     lua_pop(L, 1);
 
+    lua_getglobal(L, "border_active_outer");
+    if (lua_isnumber(L, -1)) cfg.border_col_active_outer = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "border_normal_outer");
+    if (lua_isnumber(L, -1)) cfg.border_col_normal_outer = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "border_width_outer");
+    if (lua_isnumber(L, -1)) cfg.border_width_outer = (uint32_t)lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
     lua_getglobal(L, "motion_throttle_hz");
     if (lua_isnumber(L, -1)) cfg.motion_throttle_hz = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_color");
-    if (lua_isnumber(L, -1)) cfg.decor.color = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_top");
-    if (lua_isnumber(L, -1)) cfg.decor.top = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_right");
-    if (lua_isnumber(L, -1)) cfg.decor.right = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_bottom");
-    if (lua_isnumber(L, -1)) cfg.decor.bottom = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_left");
-    if (lua_isnumber(L, -1)) cfg.decor.left = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_title_enabled");
-    cfg.decor.title.enabled = lua_toboolean(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_title_color");
-    if (lua_isnumber(L, -1)) cfg.decor.title.color = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_title_padding");
-    if (lua_isnumber(L, -1)) cfg.decor.title.padding = (uint32_t)lua_tonumber(L, -1);
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_title_font");
-    if (lua_isstring(L, -1)) cfg.decor.title.font = strdup(lua_tostring(L, -1));
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_title_edge");
-    if (lua_isstring(L, -1)) {
-        const char *e = lua_tostring(L, -1);
-        if      (!strcmp(e, "top"))    cfg.decor.title.edge = SWC_DECOR_EDGE_TOP;
-        else if (!strcmp(e, "right"))  cfg.decor.title.edge = SWC_DECOR_EDGE_RIGHT;
-        else if (!strcmp(e, "bottom")) cfg.decor.title.edge = SWC_DECOR_EDGE_BOTTOM;
-        else                           cfg.decor.title.edge = SWC_DECOR_EDGE_LEFT;
-    }
-    lua_pop(L, 1);
-
-    lua_getglobal(L, "decor_title_align");
-    if (lua_isstring(L, -1)) {
-        const char *a = lua_tostring(L, -1);
-        if      (!strcmp(a, "center")) cfg.decor.title.align = SWC_DECOR_ALIGN_CENTER;
-        else if (!strcmp(a, "end"))    cfg.decor.title.align = SWC_DECOR_ALIGN_END;
-        else                           cfg.decor.title.align = SWC_DECOR_ALIGN_START;
-    }
     lua_pop(L, 1);
 
     lua_getglobal(L, "binds");

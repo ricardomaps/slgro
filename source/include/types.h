@@ -48,12 +48,15 @@ struct client {
 };
 
 struct config {
-    bool           decor_enabled;
-    struct         swc_decor decor;
-	uint32_t       motion_throttle_hz;
-	uint32_t       border_col_active;
-	uint32_t       border_col_normal;
-	uint32_t       border_width;
+    uint32_t       motion_throttle_hz;
+
+    uint32_t       border_col_active;
+    uint32_t       border_col_normal;
+    uint32_t       border_width;
+
+    uint32_t       border_col_active_outer;
+    uint32_t       border_col_normal_outer;
+    uint32_t       border_width_outer;
 };
 
 struct screen {
