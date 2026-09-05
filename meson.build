@@ -28,7 +28,7 @@ src = [
 ]
 
 install_data('source/config.lua',
-  install_dir: '/usr/share/slgro',
+  install_dir: get_option('sysconfdir') / 'xdg/slgro',
 )
 
 executable('slgro', src,
