@@ -75,12 +75,57 @@ static void resolve_action(const char *action, const char *arg_str, int arg_int,
     else fprintf(stderr, "slgro: sorry, unknown action >.< '%s'\n", action);
 }
 
+static int load_config_file(lua_State *L)
+{
+    char path[256];
+    const char *config_home = getenv("XDG_CONFIG_HOME");
+    const char *home = getenv("HOME");
+    const char *dir = NULL;
+    const char *suffix = NULL;
+
+    if (config_home != NULL && config_home[0] == '/') {
+        dir = config_home;
+        suffix = "slgro/config.lua";
+    } else if (home != NULL && home[0] == '/') {
+        dir = home;
+        suffix = ".config/slgro/config.lua";
+    }
+
+    if (dir) {
+        snprintf(path, sizeof(path), "%s/%s", dir, suffix);
+        if (luaL_dofile(L, path) == LUA_OK)
+            return 1;
+        lua_pop(L, 1);
+    }
+
+    const char *xdg_config_dirs = getenv("XDG_CONFIG_DIRS");
+    char *config_dirs = strdup(
+        xdg_config_dirs && xdg_config_dirs[0] != '\0'
+            ? xdg_config_dirs
+            : "/etc/xdg"
+    );
+    if (!config_dirs)
+        return 0;
+
+    const char *config_dir = strtok(config_dirs, ":");
+    int found = 0;
+    while (config_dir) {
+        if (config_dir[0] != '/') {
+            snprintf(path, sizeof(path), "%s/slgro/config.lua", config_dir);
+            if (luaL_dofile(L, path) == LUA_OK) {
+                found = 1;
+                break;
+            }
+            lua_pop(L, 1);
+        }
+        config_dir = strtok(NULL, ":") ;
+    }
+    free(config_dirs);
+    return found;
+}
+
 void load_config(void)
 {
-    const char *home = getenv("HOME");
-    char path[256];
-    snprintf(path, sizeof(path), "%s/.config/slgro/config.lua", home ? home : ".");
-
     cfg.motion_throttle_hz   = 85;
 
     cfg.border_col_active    = 0xffffffff;
@@ -94,13 +139,11 @@ void load_config(void)
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
 
-    if (luaL_dofile(L, path) != LUA_OK) {
-        if (luaL_dofile(L, "/usr/share/slgro/config.lua") != LUA_OK) {
-            fprintf(stderr, "slgro: %s\n", lua_tostring(L, -1));
-            fprintf(stderr, "slgro: using defaults :P\n");
-            lua_close(L);
-            return;
-        }
+    if (!load_config_file(L)) {
+        fprintf(stderr, "slgro: %s\n", lua_tostring(L, -1));
+        fprintf(stderr, "slgro: using defaults :P\n");
+        lua_close(L);
+        return;
     }
 
     lua_getglobal(L, "border_active");
